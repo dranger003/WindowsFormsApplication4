@@ -48,8 +48,10 @@ namespace WindowsFormsApplication4
                 //contextMenu.MenuItems[0].Tag = ToggleMode.Show;
 
                 notifyIcon.ContextMenu = contextMenu;
-                notifyIcon.Click += new EventHandler(notifyIcon_Click);
                 notifyIcon.DoubleClick += new EventHandler(contextMenu_Popup);
+                
+                // Buggy
+                //notifyIcon.Click += new EventHandler(notifyIcon_Click);
 
                 ThreadPool.QueueUserWorkItem(
                     new WaitCallback(
