@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Windows.Forms;
 
 namespace ClassLibrary1
 {
@@ -18,6 +19,8 @@ namespace ClassLibrary1
     [Guid("96575AAA-F6D2-4879-9003-E4AD9CD40C76")]
     public class Class1 : IClass1
     {
+        private static Form _form;
+
         public Class1()
         {
         }
@@ -25,6 +28,12 @@ namespace ClassLibrary1
         public void Ping()
         {
             Debug.WriteLine("Ping()");
+        }
+
+        public Form Form
+        {
+            get { return _form; }
+            set { _form = value; }
         }
     }
 }

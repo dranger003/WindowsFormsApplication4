@@ -15,6 +15,7 @@ namespace WindowsFormsApplication4
     {
         private enum ToggleMode { Show, Hide };
         private FormWindowState _previousState;
+        private bool _contextMenuVisible = false;
 
         public TrayForm()
         {
@@ -44,12 +45,44 @@ namespace WindowsFormsApplication4
 
                 contextMenu.MenuItems[0].DefaultItem = true;
                 contextMenu.Popup += new EventHandler(contextMenu_Popup);
+                //contextMenu.MenuItems[0].Tag = ToggleMode.Show;
 
                 notifyIcon.ContextMenu = contextMenu;
+                notifyIcon.Click += new EventHandler(notifyIcon_Click);
                 notifyIcon.DoubleClick += new EventHandler(contextMenu_Popup);
 
-                // Start hidden
-                Visible = false;
+                ThreadPool.QueueUserWorkItem(
+                    new WaitCallback(
+                        delegate(object state1)
+                        {
+                            Thread.Sleep(500);
+
+                            BeginInvoke(
+                                new WaitCallback(
+                                    delegate(object state2)
+                                    {
+                                        WindowState = FormWindowState.Minimized;
+
+                                        notifyIcon.ShowBalloonTip(4000, "WindowsFormsApplication4", "Still running...", ToolTipIcon.Info);
+                                    }),
+                                new object[] { null });
+                        }),
+                    null);
+            }
+        }
+
+        private void notifyIcon_Click(object sender, EventArgs e)
+        {
+            if (!_contextMenuVisible)
+            {
+                bool visible = Visible;
+                if (!visible)
+                    Visible = true;
+
+                notifyIcon.ContextMenu.Show(this, PointToClient(Cursor.Position));
+
+                if (!visible)
+                    visible = false;
             }
         }
 
@@ -58,7 +91,10 @@ namespace WindowsFormsApplication4
             ContextMenu contextMenu = null;
 
             if (sender is ContextMenu)
+            {
                 contextMenu = (ContextMenu)sender;
+                _contextMenuVisible = true;
+            }
             else if (sender is NotifyIcon)
                 contextMenu = ((NotifyIcon)sender).ContextMenu;
 
@@ -74,7 +110,7 @@ namespace WindowsFormsApplication4
 
         private void TrayForm_Load(object sender, EventArgs e)
         {
-            WindowState = FormWindowState.Minimized;
+            //WindowState = FormWindowState.Minimized;
         }
 
         private void TrayForm_SizeChanged(object sender, EventArgs e)
@@ -123,6 +159,8 @@ namespace WindowsFormsApplication4
 
         private void ToggleForm(object sender, EventArgs e)
         {
+            _contextMenuVisible = false;
+
             switch ((ToggleMode)notifyIcon.ContextMenu.MenuItems[0].Tag)
             {
                 case ToggleMode.Show:
