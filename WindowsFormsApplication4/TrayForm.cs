@@ -52,24 +52,6 @@ namespace WindowsFormsApplication4
                 
                 // Buggy
                 //notifyIcon.Click += new EventHandler(notifyIcon_Click);
-
-                ThreadPool.QueueUserWorkItem(
-                    new WaitCallback(
-                        delegate(object state1)
-                        {
-                            Thread.Sleep(500);
-
-                            BeginInvoke(
-                                new WaitCallback(
-                                    delegate(object state2)
-                                    {
-                                        WindowState = FormWindowState.Minimized;
-
-                                        notifyIcon.ShowBalloonTip(4000, "WindowsFormsApplication4", "Still running...", ToolTipIcon.Info);
-                                    }),
-                                new object[] { null });
-                        }),
-                    null);
             }
         }
 
@@ -113,6 +95,24 @@ namespace WindowsFormsApplication4
         private void TrayForm_Load(object sender, EventArgs e)
         {
             //WindowState = FormWindowState.Minimized;
+
+            ThreadPool.QueueUserWorkItem(
+                new WaitCallback(
+                    delegate(object state1)
+                    {
+                        Thread.Sleep(500);
+
+                        BeginInvoke(
+                            new WaitCallback(
+                                delegate(object state2)
+                                {
+                                    WindowState = FormWindowState.Minimized;
+
+                                    notifyIcon.ShowBalloonTip(4000, "WindowsFormsApplication4", "Still running...", ToolTipIcon.Info);
+                                }),
+                            new object[] { null });
+                    }),
+                null);
         }
 
         private void TrayForm_SizeChanged(object sender, EventArgs e)
